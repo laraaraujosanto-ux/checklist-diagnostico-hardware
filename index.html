@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico & Checklist de Hardware</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --success: #22c55e;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            max-width: 750px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        header {
+            border-bottom: 1px solid #334155;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 1.6rem; }
+        p { color: var(--muted); margin: 0; font-size: 0.95rem; }
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+        h2 { font-size: 1.1rem; margin-top: 0; color: #e2e8f0; }
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #33415555;
+            cursor: pointer;
+        }
+        .item:last-child { border-bottom: none; }
+        input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--success);
+            cursor: pointer;
+        }
+        .checked { text-decoration: line-through; color: var(--muted); }
+        .progress-bar {
+            background: #334155;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        .progress-fill {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        button {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { opacity: 0.9; }
+        textarea {
+            width: 100%;
+            background: #0f172a;
+            color: var(--text);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Checklist Técnico de Manutenção de Hardware</h1>
+    <p>Ferramenta de inspeção preventiva, térmica e diagnóstico de bancada</p>
+</header>
+
+<div class="card">
+    <h2>Progresso da Bancada: <span id="percent">0%</span></h2>
+    <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+</div>
+
+<div class="card">
+    <h2>1. Inspeção Física e Limpeza</h2>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Desconexão de energia e descarregamento estático</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Remoção de poeira em coolers, dissipadores e filtros</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Inspeção visual de capacitores e trilhas da placa-mãe</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Limpeza de contatos (RAM e GPU) com álcool isopropílico</label>
+</div>
+
+<div class="card">
+    <h2>2. Sistema Térmico</h2>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Remoção da pasta térmica ressecada (CPU/GPU)</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Verificação e substituição de thermal pads (VRM/Memórias)</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Aplicação de nova pasta térmica de alta condutividade</label>
+</div>
+
+<div class="card">
+    <h2>3. Testes de Estabilidade e Sistema</h2>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Verificação de saúde do SSD/HD (S.M.A.R.T.)</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Teste de estresse térmico e monitoramento de clocks</label>
+    <label class="item"><input type="checkbox" onchange="atualizar()"> Atualização de drivers críticos e verificação do Windows</label>
+</div>
+
+<div class="card">
+    <h2>Relatório Técnico Rápido</h2>
+    <textarea id="obs" rows="3" placeholder="Ex: Notebook Acer Nitro V15 - Temperatura reduzida de 95°C para 74°C após troca de pasta térmica..."></textarea>
+    <button onclick="copiarRelatorio()">Copiar Relatório para Chamado</button>
+    <button onclick="limpar()" style="background:#475569; color:#fff; margin-left:8px;">Resetar</button>
+</div>
+
+<script>
+    function atualizar() {
+        const boxes = document.querySelectorAll('input[type="checkbox"]');
+        let marcados = 0;
+        boxes.forEach(box => {
+            if (box.checked) {
+                marcados++;
+                box.parentElement.classList.add('checked');
+            } else {
+                box.parentElement.classList.remove('checked');
+            }
+        });
+        const pct = Math.round((marcados / boxes.length) * 100);
+        document.getElementById('percent').innerText = pct + '%';
+        document.getElementById('fill').style.width = pct + '%';
+    }
+
+    function copiarRelatorio() {
+        const pct = document.getElementById('percent').innerText;
+        const obs = document.getElementById('obs').value || 'Sem observações adicionais.';
+        const texto = `RELATÓRIO DE MANUTENÇÃO\nConclusão do Checklist: ${pct}\nObservações Técnicas: ${obs}`;
+        navigator.clipboard.writeText(texto);
+        alert('Relatório copiado para a área de transferência!');
+    }
+
+    function limpar() {
+        document.querySelectorAll('input[type="checkbox"]').forEach(b => b.checked = false);
+        document.getElementById('obs').value = '';
+        atualizar();
+    }
+</script>
+
+</body>
+</html>
