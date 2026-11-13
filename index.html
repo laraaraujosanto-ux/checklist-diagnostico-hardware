@@ -25,6 +25,11 @@
             border-bottom: 1px solid #334155;
             padding-bottom: 15px;
             margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 1.6rem; }
         p { color: var(--muted); margin: 0; font-size: 0.95rem; }
@@ -65,17 +70,26 @@
             width: 0%;
             transition: width 0.3s ease;
         }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
         button {
             background: var(--accent);
             color: #0f172a;
             border: none;
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            font-size: 0.9rem;
         }
         button:hover { opacity: 0.9; }
+        .btn-pdf { background: var(--success); color: #052e16; }
+        .btn-link { background: #334155; color: #f8fafc; border: 1px solid #475569; }
+        .btn-reset { background: #475569; color: #fff; }
         textarea {
             width: 100%;
             background: #0f172a;
@@ -87,13 +101,40 @@
             margin-top: 10px;
             font-family: inherit;
         }
+
+        /* Formatação limpa para gerar PDF */
+        @media print {
+            body {
+                background: #ffffff;
+                color: #0f172a;
+                margin: 0;
+                max-width: 100%;
+            }
+            .card {
+                background: #ffffff;
+                border: 1px solid #cbd5e1;
+                break-inside: avoid;
+            }
+            h1 { color: #0369a1; }
+            h2 { color: #1e293b; }
+            p, .checked { color: #475569; }
+            textarea {
+                background: #f8fafc;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
+            }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Checklist Técnico de Manutenção de Hardware</h1>
-    <p>Ferramenta de inspeção preventiva, térmica e diagnóstico de bancada</p>
+    <div>
+        <h1>Checklist Técnico de Manutenção de Hardware</h1>
+        <p>Ferramenta de inspeção preventiva, térmica e diagnóstico de bancada</p>
+    </div>
+    <button class="btn-link no-print" onclick="copiarLink()">Copiar Link</button>
 </header>
 
 <div class="card">
@@ -118,49 +159,4 @@
 
 <div class="card">
     <h2>3. Testes de Estabilidade e Sistema</h2>
-    <label class="item"><input type="checkbox" onchange="atualizar()"> Verificação de saúde do SSD/HD (S.M.A.R.T.)</label>
-    <label class="item"><input type="checkbox" onchange="atualizar()"> Teste de estresse térmico e monitoramento de clocks</label>
-    <label class="item"><input type="checkbox" onchange="atualizar()"> Atualização de drivers críticos e verificação do Windows</label>
-</div>
-
-<div class="card">
-    <h2>Relatório Técnico Rápido</h2>
-    <textarea id="obs" rows="3" placeholder="Ex: Notebook Acer Nitro V15 - Temperatura reduzida de 95°C para 74°C após troca de pasta térmica..."></textarea>
-    <button onclick="copiarRelatorio()">Copiar Relatório para Chamado</button>
-    <button onclick="limpar()" style="background:#475569; color:#fff; margin-left:8px;">Resetar</button>
-</div>
-
-<script>
-    function atualizar() {
-        const boxes = document.querySelectorAll('input[type="checkbox"]');
-        let marcados = 0;
-        boxes.forEach(box => {
-            if (box.checked) {
-                marcados++;
-                box.parentElement.classList.add('checked');
-            } else {
-                box.parentElement.classList.remove('checked');
-            }
-        });
-        const pct = Math.round((marcados / boxes.length) * 100);
-        document.getElementById('percent').innerText = pct + '%';
-        document.getElementById('fill').style.width = pct + '%';
-    }
-
-    function copiarRelatorio() {
-        const pct = document.getElementById('percent').innerText;
-        const obs = document.getElementById('obs').value || 'Sem observações adicionais.';
-        const texto = `RELATÓRIO DE MANUTENÇÃO\nConclusão do Checklist: ${pct}\nObservações Técnicas: ${obs}`;
-        navigator.clipboard.writeText(texto);
-        alert('Relatório copiado para a área de transferência!');
-    }
-
-    function limpar() {
-        document.querySelectorAll('input[type="checkbox"]').forEach(b => b.checked = false);
-        document.getElementById('obs').value = '';
-        atualizar();
-    }
-</script>
-
-</body>
-</html>
+    <label class="item
